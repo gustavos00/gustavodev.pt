@@ -1,4 +1,25 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "marmita.gustavodev.pt" }],
+      "destination": "/marmita"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/marmita",
+      "has": [{ "type": "host", "value": "gustavodev.pt" }],
+      "destination": "https://marmita.gustavodev.pt/",
+      "permanent": true
+    },
+    {
+      "source": "/marmita",
+      "has": [{ "type": "host", "value": "www.gustavodev.pt" }],
+      "destination": "https://marmita.gustavodev.pt/",
+      "permanent": true
+    }
+  ]
 }

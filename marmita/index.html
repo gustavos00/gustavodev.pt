@@ -3,80 +3,233 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Marmita · Gustavo Santos</title>
-  <meta name="description" content="Marmita is an open-source, zone-based window manager for macOS.">
-  <meta property="og:title" content="Marmita">
-  <meta property="og:description" content="An open-source, zone-based window manager for macOS.">
-  <meta property="og:url" content="https://gustavodev.pt/marmita">
-  <meta name="theme-color" content="#121212">
+  <title>Marmita · Zones for your Mac</title>
+  <meta name="description" content="Marmita is a free, open-source window manager for macOS. Draw the zones you want, then drop windows into them with the mouse or the keyboard.">
+  <meta property="og:title" content="Marmita · Zones for your Mac">
+  <meta property="og:description" content="Draw the zones you want, then drop windows into them with the mouse or the keyboard. Free and open source.">
+  <meta property="og:url" content="https://marmita.gustavodev.pt">
+  <meta name="theme-color" content="#f5a93a">
   <link rel="icon" href="/assets/marmita-icon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,700..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/marmita.css">
 </head>
 <body>
-  <div class="page">
-    <header class="masthead">
-      <a class="name" href="/">gustavodev.pt</a>
-      <nav>
-        <a href="/#projects">Projects</a>
-        <a href="https://github.com/gustavos00/marmita">Source</a>
-      </nav>
-    </header>
+  <header class="hero">
+    <div class="wrap">
+      <div class="topbar">
+        <a class="logo" href="/"><img src="/assets/marmita-icon.svg" alt="">Marmita</a>
+        <a class="btn btn-solid" href="#get">Get Marmita</a>
+      </div>
+      <div class="hero-grid">
+        <div>
+          <h1>Zones for your Mac.</h1>
+          <p class="lede">Draw the zones you want, then drop windows into them with the mouse or the keyboard. Every window lands at exactly the right size.</p>
+          <p class="lede">Each display keeps a layout of its own.</p>
+          <div class="cta">
+            <a class="btn btn-solid" href="#get">Get Marmita</a>
+            <a class="btn btn-line" href="#try">Try it on this page</a>
+          </div>
+          <p class="fine">Free · Open source · macOS 14 or later</p>
+        </div>
+        <figure class="hero-art">
+          <img src="/assets/marmita-lunchbox.svg" alt="An open, steaming lunchbox with an app window packed neatly into each compartment" width="640" height="560">
+          <figcaption><strong>marmita</strong> <em>(n., Portuguese)</em>: a lunchbox. Everything in its own compartment, and nothing spills into the rest.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </header>
 
-    <section class="intro">
-      <h1>Marmita</h1>
-      <p>
-        A zone-based window manager for macOS. You define layouts with the zones you want; when
-        you drag a window with Shift held, the zones appear on screen and the window snaps and
-        resizes into the one you drop it on. It is a native app with no dependencies, and the
-        source is available under the MIT licence.
-      </p>
-    </section>
+  <section class="try" id="try">
+    <div class="wrap">
+      <div class="try-head">
+        <h2>Try it right here.</h2>
+        <div>
+          <p class="lede">This is the real behaviour, on a pretend desktop. Grab the Notes window and have a go.</p>
+          <div class="how" style="margin-top:24px">
+            <div><kbd>⇧</kbd> Drag the title bar with Shift held, and drop it on a zone.</div>
+            <div class="desk-only"><kbd>⌃</kbd><kbd>⌥</kbd><kbd>←</kbd><kbd>→</kbd> Move it to the previous or next zone.</div>
+            <div class="desk-only"><kbd>⌃</kbd><kbd>⌥</kbd><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> Jump straight to a zone.</div>
+          </div>
+        </div>
+      </div>
 
-    <section class="section">
-      <h2>Screen</h2>
-      <figure class="figure">
-        <img src="/assets/marmita-hero.svg" alt="A window being dragged over a three-zone layout, with zone 1 highlighted" width="1200" height="700">
-        <figcaption>A window being dragged over a three-zone layout.</figcaption>
-      </figure>
-    </section>
+      <div class="scene" data-stage aria-label="Interactive demo: drag the Notes window with Shift held, or use Control Option arrows, to snap it into a zone">
+        <div class="menubar">
+          <div class="left"><b>Finder</b><span>File</span><span>Edit</span><span>View</span><span>Window</span></div>
+          <div class="right">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1" y="1" width="6" height="14" rx="1.5" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="currentColor"/></svg>
+            <span>Tue 9:41</span>
+          </div>
+        </div>
+        <div class="desk">
+          <div class="zone" data-x="1.2" data-y="2" data-w="48" data-h="96">1</div>
+          <div class="zone" data-x="50.6" data-y="2" data-w="48.2" data-h="47.4">2</div>
+          <div class="zone" data-x="50.6" data-y="50.6" data-w="48.2" data-h="47.4">3</div>
+          <div class="win warm" data-win="notes">
+            <div class="bar"><i></i><i></i><i></i><span>Notes</span></div>
+            <div class="body"><b class="h"></b><b></b><b style="width:88%"></b><b style="width:72%"></b><b class="h" style="width:40%;margin-top:0.8cqw"></b><b></b><b style="width:80%"></b></div>
+          </div>
+          <svg class="cursor" viewBox="0 0 22 30" aria-hidden="true"><path d="M2 2 L2 24 L8 18.5 L12 27 L16 25.2 L12 17 L19.5 17 Z" fill="#111" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="keycap" aria-hidden="true">⇧ Shift</div>
+      </div>
+      <div class="pad" aria-label="Move the Notes window">
+        <button type="button" data-step="-1" aria-label="Previous zone">←</button>
+        <button type="button" data-zone="0">1</button>
+        <button type="button" data-zone="1">2</button>
+        <button type="button" data-zone="2">3</button>
+        <button type="button" data-step="1" aria-label="Next zone">→</button>
+      </div>
+    </div>
+  </section>
 
-    <section class="section">
-      <h2>Features</h2>
-      <ul class="plain">
-        <li>Snap by dragging, with a modifier key of your choice.</li>
-        <li>Keyboard shortcuts to move the active window between zones and between displays.</li>
-        <li>A layout editor, with presets and zones drawn on a grid.</li>
-        <li>One layout per display.</li>
-        <li>Lives in the menu bar, with no Dock icon.</li>
-      </ul>
-    </section>
+  <section class="split">
+    <div class="copy">
+      <h2>Draw a layout that fits.</h2>
+      <p class="lede">Start from columns, grids or a main window with a stack beside it, or draw your own zones on a grid that keeps them aligned. Move them, resize them, keep as many layouts as you like.</p>
+    </div>
+    <div class="panel bg-blue">
+      <div class="scene" aria-hidden="true">
+        <div class="editor">
+          <div class="bar"><i></i><i></i><i></i></div>
+          <div class="side"><b></b><b></b><b></b><b></b></div>
+          <div class="canvas">
+            <div class="draw d1">1</div>
+            <div class="draw d2">2</div>
+            <div class="draw d3">3</div>
+            <svg class="draw-cursor" viewBox="0 0 22 30"><path d="M2 2 L2 24 L8 18.5 L12 27 L16 25.2 L12 17 L19.5 17 Z" fill="#111" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+      <p class="caption">The layout editor: drag across the grid to draw a zone.</p>
+    </div>
+  </section>
 
-    <section class="section">
-      <h2>Shortcuts</h2>
-      <table>
-        <tr><td>⌃ ⌥ ← →</td><td>Previous or next zone</td></tr>
-        <tr><td>⌃ ⌥ 1–9</td><td>Zone with that number</td></tr>
-        <tr><td>⌃ ⌥ ⌘ ← →</td><td>Previous or next display</td></tr>
-        <tr><td>⇧ + drag</td><td>Show the zones</td></tr>
-      </table>
-    </section>
+  <section class="split flip">
+    <div class="copy">
+      <h2>Or never touch the mouse.</h2>
+      <p class="lede">Send the active window to the next zone with <kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>→</kbd>, or straight to zone 1 to 9 with its number. Prefer another key for dragging? Pick Option, Control or Command.</p>
+    </div>
+    <div class="panel bg-green">
+      <div class="scene" aria-hidden="true">
+        <div class="menubar"><div class="left"><b>Notes</b><span>File</span><span>Edit</span><span>Format</span></div><div class="right"><span>Tue 9:41</span></div></div>
+        <div class="desk">
+          <div class="ghost-zone" style="left:1.2%;top:2%;width:48%;height:96%"></div>
+          <div class="ghost-zone" style="left:50.6%;top:2%;width:48.2%;height:47.4%"></div>
+          <div class="ghost-zone" style="left:50.6%;top:50.6%;width:48.2%;height:47.4%"></div>
+          <div class="win cool kb-win">
+            <div class="bar"><i></i><i></i><i></i><span>Mail</span></div>
+            <div class="body"><b class="h"></b><b></b><b style="width:84%"></b><b style="width:66%"></b><b></b><b style="width:76%"></b></div>
+          </div>
+        </div>
+        <div class="keycap kb-cap">⌃ ⌥ →</div>
+      </div>
+      <p class="caption">Each press moves the window to the next zone, and back round to the first.</p>
+    </div>
+  </section>
 
-    <section class="section">
-      <h2>Install</h2>
+  <section class="split">
+    <div class="copy">
+      <h2>One layout per screen.</h2>
+      <p class="lede">A wide monitor wants columns and a vertical one wants rows. Marmita remembers a layout for each display, and <kbd>⌃</kbd> <kbd>⌥</kbd> <kbd>⌘</kbd> <kbd>→</kbd> moves a window across, into the same zone.</p>
+    </div>
+    <div class="panel bg-navy">
+      <div class="scene" aria-hidden="true" style="background:linear-gradient(160deg,#1b2336,#0d1220)">
+        <div class="displays">
+          <div class="display wide">
+            <div class="ghost-zone" style="left:2%;top:3%;width:31%;height:94%"></div>
+            <div class="ghost-zone" style="left:34.5%;top:3%;width:31%;height:94%"></div>
+            <div class="ghost-zone" style="left:67%;top:3%;width:31%;height:94%"></div>
+            <div class="dsp-win from" style="left:34.5%;top:3%;width:31%;height:94%"></div>
+          </div>
+          <div class="display tall">
+            <div class="ghost-zone" style="left:4%;top:2%;width:92%;height:47%"></div>
+            <div class="ghost-zone" style="left:4%;top:51%;width:92%;height:47%"></div>
+            <div class="dsp-win to" style="left:4%;top:2%;width:92%;height:47%"></div>
+          </div>
+        </div>
+        <div class="keycap dsp-cap">⌃ ⌥ ⌘ →</div>
+      </div>
+      <p class="caption">Columns on the wide display, rows on the portrait one.</p>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <h2>Small, native and yours to read.</h2>
+      <p>Marmita is written in Swift with the frameworks that ship with macOS. It is free, and every line is on GitHub.</p>
+      <div class="pillars">
+        <div><h3>Menu bar only</h3><p>No Dock icon and nothing in the way.</p></div>
+        <div><h3>Offline</h3><p>It never connects to the internet. Layouts are a small file on your Mac.</p></div>
+        <div><h3>No dependencies</h3><p>Just AppKit, SwiftUI and the Accessibility API.</p></div>
+        <div><h3>MIT licence</h3><p>Use it, change it, build on it.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="plain-section" id="shortcuts">
+    <div class="wrap">
+      <h2>Shortcuts.</h2>
+      <div class="table">
+        <div class="row"><span>Previous or next zone</span><span class="combo"><kbd>⌃</kbd><kbd>⌥</kbd><kbd>←</kbd><kbd>→</kbd></span></div>
+        <div class="row"><span>Jump to zone 1 to 9</span><span class="combo"><kbd>⌃</kbd><kbd>⌥</kbd><kbd>1</kbd><kbd>…</kbd><kbd>9</kbd></span></div>
+        <div class="row"><span>Previous or next display</span><span class="combo"><kbd>⌃</kbd><kbd>⌥</kbd><kbd>⌘</kbd><kbd>←</kbd><kbd>→</kbd></span></div>
+        <div class="row"><span>Show the zones while dragging</span><span class="combo"><kbd>⇧</kbd></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="plain-section" id="faq">
+    <div class="wrap">
+      <h2>Questions.</h2>
+      <div class="faq">
+        <details>
+          <summary>Is Marmita free?</summary>
+          <p>Yes. It is free and open source under the MIT licence.</p>
+        </details>
+        <details>
+          <summary>Why does it ask for Accessibility access?</summary>
+          <p>macOS only lets an app move and resize other apps' windows through the Accessibility API, so Marmita needs that permission to do its job. It uses it for nothing else, and it never connects to the internet.</p>
+        </details>
+        <details>
+          <summary>Does it work with several displays?</summary>
+          <p>Yes. Each display keeps its own layout, the zones of every screen appear while you drag, and a shortcut moves the active window to the next display.</p>
+        </details>
+        <details>
+          <summary>I already use Rectangle. Will they clash?</summary>
+          <p>Both use Control and Option with the arrow keys by default, so keep only one of them active for those shortcuts.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="final" id="get">
+    <div class="wrap final-grid">
       <div>
-        <p style="margin-top:0">Requires macOS 14 and Xcode 16, or the Command Line Tools with Swift 6.</p>
-<pre>git clone https://github.com/gustavos00/marmita.git
+        <h2>Free. Yours to keep.</h2>
+        <p class="lede">For now, Marmita is built from source. You need macOS 14 and Xcode 16, or the Command Line Tools with Swift 6.</p>
+        <div class="cta"><a class="btn btn-solid" href="https://github.com/gustavos00/marmita">View on GitHub</a></div>
+      </div>
+      <div>
+<pre><span class="c"># clone, build and open</span>
+git clone https://github.com/gustavos00/marmita.git
 cd marmita
 ./scripts/build-app.sh
 open build/Marmita.app</pre>
-        <p>On first launch, macOS asks for Accessibility permission, which Marmita needs to move other apps' windows.</p>
+        <p class="note">On first launch, macOS asks for Accessibility access. Grant it in System Settings › Privacy &amp; Security › Accessibility.</p>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <footer class="colophon"><a href="https://github.com/gustavos00/marmita">github.com/gustavos00/marmita</a></footer>
-  </div>
+  <footer>
+    <div class="wrap">
+      <span>Made by <a href="https://gustavodev.pt">Gustavo Santos</a></span>
+      <span><a href="https://github.com/gustavos00/marmita">GitHub</a> · <a href="https://github.com/gustavos00/marmita/blob/main/LICENSE">MIT licence</a></span>
+    </div>
+  </footer>
+
+  <script src="/assets/marmita-demo.js" defer></script>
 </body>
 </html>
