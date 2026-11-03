@@ -5,7 +5,7 @@ Source of [gustavodev.pt](https://gustavodev.pt), my portfolio: a short introduc
 Plain HTML and one stylesheet, with no build step. Vercel serves it with clean URLs (`vercel.json`), so `marmita/index.html` is `/marmita`.
 
 ```
-index.html          portfolio
+home.html           portfolio (served at /; `vercel.json` sends marmita.gustavodev.pt to `marmita/`)
 marmita/            project pages
 subagent-city/
 toque/

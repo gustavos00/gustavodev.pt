@@ -6,9 +6,18 @@
       "source": "/",
       "has": [{ "type": "host", "value": "marmita.gustavodev.pt" }],
       "destination": "/marmita"
+    },
+    {
+      "source": "/",
+      "destination": "/home"
     }
   ],
   "redirects": [
+    {
+      "source": "/home",
+      "destination": "/",
+      "permanent": true
+    },
     {
       "source": "/marmita",
       "has": [{ "type": "host", "value": "gustavodev.pt" }],
