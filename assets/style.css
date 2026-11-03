@@ -321,3 +321,84 @@ code {
     max-width: 240px;
   }
 }
+
+/* Personal intro and photography */
+
+.intro-person {
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: 48px;
+  align-items: end;
+}
+
+.intro-person p + p {
+  margin-top: 16px;
+}
+
+.portrait {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  object-position: 50% 20%;
+  filter: grayscale(0.15);
+}
+
+.photo-lede {
+  margin: 0 0 24px;
+  max-width: 560px;
+}
+
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 150px;
+  gap: 8px;
+}
+
+.photo-grid a {
+  display: block;
+  overflow: hidden;
+  grid-row: span 2;
+}
+
+.photo-grid a.wide {
+  grid-row: span 2;
+}
+
+.photo-grid img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease, filter 0.4s ease;
+  filter: saturate(0.9);
+}
+
+.photo-grid a:hover img {
+  transform: scale(1.03);
+  filter: none;
+}
+
+.photo-more {
+  margin: 18px 0 0;
+  font: 15px/1.5 var(--sans);
+}
+
+@media (max-width: 640px) {
+  .intro-person {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .portrait {
+    width: 160px;
+    order: -1;
+  }
+
+  .photo-grid {
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 120px;
+  }
+}
