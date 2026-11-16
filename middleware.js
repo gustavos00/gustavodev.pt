@@ -6,6 +6,9 @@ const SUPABASE_URL = 'https://fdmhaiwrechavluumeym.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_TC_D6gGODob7Tp7Ea-zWXg_Rwh7HJX1';
 const PROTECTED_HOSTS = new Set(['eu.gustavodev.pt']);
 const OPEN_PATHS = new Set(['/entrar', '/eu/entrar']);
+// Private pages whose path is also a public page's. Vercel serves a matching file before it reads the
+// rewrites in vercel.json, so on the portal host these are rewritten here, ahead of the file system.
+const PRIVATE_TWINS = new Map([['/toque', '/eu/toque']]);
 
 export const config = {
   matcher: ['/((?!assets/|favicon).*)'],
@@ -72,6 +75,10 @@ function continueRequest() {
   return new Response(null, { headers: { 'x-middleware-next': '1' } });
 }
 
+function rewriteRequest(url, pathname) {
+  return new Response(null, { headers: { 'x-middleware-rewrite': new URL(pathname, url).toString() } });
+}
+
 export default async function middleware(request) {
   const url = new URL(request.url);
   const isPortalHost = PROTECTED_HOSTS.has(url.hostname);
@@ -84,7 +91,9 @@ export default async function middleware(request) {
   }
 
   if (await isSignedIn(request)) {
-    return continueRequest();
+    const twin = isPortalHost ? PRIVATE_TWINS.get(url.pathname) : undefined;
+
+    return twin ? rewriteRequest(url, twin) : continueRequest();
   }
 
   const signIn = new URL('https://eu.gustavodev.pt/entrar');

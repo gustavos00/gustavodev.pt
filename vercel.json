@@ -33,16 +33,6 @@
       "destination": "/eu/orcamentos"
     },
     {
-      "source": "/toque",
-      "has": [
-        {
-          "type": "host",
-          "value": "eu.gustavodev.pt"
-        }
-      ],
-      "destination": "/eu/toque"
-    },
-    {
       "source": "/toque-api/:path*",
       "has": [
         {
