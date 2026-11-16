@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Toque · eu</title>
+  <meta name="theme-color" content="#121212">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/style.css">
+  <link rel="stylesheet" href="/assets/eu.css">
+</head>
+<body>
+  <main class="eu-page">
+    <header class="eu-bar">
+      <a href="/">← eu</a>
+      <button type="button" id="signout">Sair</button>
+    </header>
+
+    <h1 class="eu-title">Toque · a casa hoje</h1>
+    <p class="eu-lede" id="lede">A carregar as tarefas…</p>
+
+    <div class="eu-tiles">
+      <div class="eu-stat">
+        <span class="eu-stat-label">Em atraso</span>
+        <span class="eu-stat-value" id="stat-overdue">—</span>
+        <span class="eu-stat-note">tarefas recorrentes</span>
+      </div>
+      <div class="eu-stat">
+        <span class="eu-stat-label">Por confirmar hoje</span>
+        <span class="eu-stat-value" id="stat-ack">—</span>
+        <span class="eu-stat-note" id="stat-ack-note">—</span>
+      </div>
+      <div class="eu-stat">
+        <span class="eu-stat-label">Temporizadores</span>
+        <span class="eu-stat-value" id="stat-timers">—</span>
+        <span class="eu-stat-note">a correr ou prontos</span>
+      </div>
+    </div>
+
+    <section aria-labelledby="h-recurring">
+      <h2 class="eu-h2" id="h-recurring">Recorrentes</h2>
+      <p class="eu-sub">Pela ordem em que ficam devidas.</p>
+      <div class="eu-scroll">
+        <table class="eu-table">
+          <thead>
+            <tr>
+              <th>Tarefa</th>
+              <th>Estado</th>
+              <th>Última vez</th>
+              <th>Devida</th>
+            </tr>
+          </thead>
+          <tbody id="rows-recurring"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-today">
+      <h2 class="eu-h2" id="h-today">Hoje e temporizadores</h2>
+      <div class="eu-scroll">
+        <table class="eu-table">
+          <thead>
+            <tr>
+              <th>Tarefa</th>
+              <th>Estado</th>
+              <th>Quando</th>
+            </tr>
+          </thead>
+          <tbody id="rows-today"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-events">
+      <h2 class="eu-h2" id="h-events">Últimos registos</h2>
+      <div class="eu-scroll">
+        <table class="eu-table">
+          <thead>
+            <tr>
+              <th>Quando</th>
+              <th>O quê</th>
+              <th>Tarefa</th>
+            </tr>
+          </thead>
+          <tbody id="rows-events"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="/assets/eu-auth.js"></script>
+  <script>
+    // Toque's own API, proxied by vercel.json at /toque-api so the call stays on this origin.
+    // Toque accepts the portal's Supabase session as a Bearer token (TOQUE_PORTAL_* on its server).
+    (async function () {
+      var API = '/toque-api/dashboard';
+      var EVENT_LABEL = {
+        scan: 'Etiqueta tocada',
+        task_created: 'Tarefa criada',
+        task_updated: 'Tarefa alterada',
+        task_deleted: 'Tarefa apagada',
+        timer_started: 'Temporizador iniciado',
+        timer_finished: 'Temporizador terminou',
+        timer_cancelled: 'Temporizador cancelado',
+        acked: 'Confirmada',
+        done: 'Feita',
+        snoozed: 'Adiada',
+        notification_sent: 'Lembrete enviado',
+        notification_failed: 'Lembrete falhou',
+      };
+      var TIMER_LABEL = { ready: 'Pronto', running: 'A correr', handled: 'Tratado', idle: 'Parado' };
+      var formatDate = new Intl.DateTimeFormat('pt-PT', { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Lisbon' });
+
+      function showDate(value) {
+        if (!value) {
+          return '—';
+        }
+
+        var date = new Date(value);
+
+        return Number.isNaN(date.getTime()) ? '—' : formatDate.format(date);
+      }
+
+      function addCell(tr, text, className) {
+        var td = document.createElement('td');
+
+        if (className) {
+          td.className = className;
+        }
+
+        td.textContent = text;
+        tr.appendChild(td);
+
+        return td;
+      }
+
+      function addPill(tr, text, status) {
+        var td = document.createElement('td');
+        var pill = document.createElement('span');
+        pill.className = 'eu-pill';
+        pill.dataset.status = status;
+        pill.textContent = text;
+        td.appendChild(pill);
+        tr.appendChild(td);
+      }
+
+      function showEmpty(tbody, columns, text) {
+        var tr = document.createElement('tr');
+        var td = addCell(tr, text, 'eu-empty');
+        td.colSpan = columns;
+        tbody.appendChild(tr);
+      }
+
+      function renderSummary(dashboard) {
+        var overdue = dashboard.recurring.filter(function (r) { return r.overdue; }).length;
+        var pending = dashboard.untilAckToday.filter(function (r) { return !r.acked; }).length;
+        var active = dashboard.timers.filter(function (t) { return t.phase === 'running' || t.phase === 'ready'; }).length;
+
+        document.getElementById('stat-overdue').textContent = String(overdue);
+        document.getElementById('stat-ack').textContent = String(pending);
+        document.getElementById('stat-ack-note').textContent = 'de ' + dashboard.untilAckToday.length + ' previstas hoje';
+        document.getElementById('stat-timers').textContent = String(active);
+
+        var lede = document.getElementById('lede');
+
+        if (overdue === 0 && pending === 0) {
+          lede.textContent = 'Está tudo em dia. Atualizado ' + showDate(dashboard.now) + '.';
+        } else {
+          lede.textContent = overdue + (overdue === 1 ? ' tarefa em atraso' : ' tarefas em atraso') + ' e ' + pending + ' por confirmar hoje. Atualizado ' + showDate(dashboard.now) + '.';
+        }
+      }
+
+      function renderRecurring(dashboard) {
+        var tbody = document.getElementById('rows-recurring');
+        tbody.replaceChildren();
+
+        if (dashboard.recurring.length === 0) {
+          showEmpty(tbody, 4, 'Sem tarefas recorrentes.');
+          return;
+        }
+
+        dashboard.recurring.forEach(function (r) {
+          var tr = document.createElement('tr');
+          addCell(tr, r.task.name, 'eu-company');
+          addPill(tr, r.overdue ? 'Em atraso' : 'Em dia', r.overdue ? 'recusou' : 'orcamento');
+          addCell(tr, showDate(r.lastDoneAt), 'eu-muted');
+          addCell(tr, showDate(r.dueAt), 'eu-muted');
+          tbody.appendChild(tr);
+        });
+      }
+
+      function renderToday(dashboard) {
+        var tbody = document.getElementById('rows-today');
+        tbody.replaceChildren();
+
+        dashboard.untilAckToday.forEach(function (r) {
+          var tr = document.createElement('tr');
+          addCell(tr, r.task.name, 'eu-company');
+          addPill(tr, r.acked ? 'Confirmada' : 'Por confirmar', r.acked ? 'orcamento' : 'respondeu');
+          addCell(tr, 'hoje', 'eu-muted');
+          tbody.appendChild(tr);
+        });
+
+        dashboard.timers.forEach(function (t) {
+          var tr = document.createElement('tr');
+          var when = t.phase === 'running' ? 'termina ' + showDate(t.endsAt) : t.phase === 'handled' ? showDate(t.handledAt) : showDate(t.startedAt);
+          addCell(tr, t.task.name, 'eu-company');
+          addPill(tr, TIMER_LABEL[t.phase] || t.phase, t.phase === 'ready' ? 'respondeu' : t.phase === 'handled' ? 'orcamento' : '');
+          addCell(tr, when, 'eu-muted');
+          tbody.appendChild(tr);
+        });
+
+        if (dashboard.untilAckToday.length === 0 && dashboard.timers.length === 0) {
+          showEmpty(tbody, 3, 'Nada para hoje.');
+        }
+      }
+
+      function renderEvents(dashboard) {
+        var tbody = document.getElementById('rows-events');
+        tbody.replaceChildren();
+
+        if (dashboard.recentEvents.length === 0) {
+          showEmpty(tbody, 3, 'Ainda sem registos.');
+          return;
+        }
+
+        dashboard.recentEvents.forEach(function (e) {
+          var tr = document.createElement('tr');
+          addCell(tr, showDate(e.at), 'eu-muted');
+          addCell(tr, EVENT_LABEL[e.type] || e.type);
+          addCell(tr, e.taskName || '—', e.taskName ? '' : 'eu-muted');
+          tbody.appendChild(tr);
+        });
+      }
+
+      document.getElementById('signout').addEventListener('click', async function () {
+        await window.euClient.auth.signOut();
+        location.replace('/entrar');
+      });
+
+      var session = await window.requireSession();
+
+      if (!session) {
+        return;
+      }
+
+      var lede = document.getElementById('lede');
+      var response;
+
+      try {
+        response = await fetch(API, { headers: { Authorization: 'Bearer ' + session.access_token }, cache: 'no-store' });
+      } catch (error) {
+        lede.textContent = 'O Toque não respondeu. Tenta outra vez daqui a pouco.';
+        return;
+      }
+
+      if (response.status === 401) {
+        lede.textContent = 'O Toque não reconheceu a tua sessão. Volta a entrar; se continuar, falta ligar o portal no servidor do Toque.';
+        return;
+      }
+
+      if (!response.ok) {
+        lede.textContent = 'Não foi possível carregar o Toque (erro ' + response.status + ').';
+        return;
+      }
+
+      var dashboard = await response.json();
+      renderSummary(dashboard);
+      renderRecurring(dashboard);
+      renderToday(dashboard);
+      renderEvents(dashboard);
+    })();
+  </script>
+</body>
+</html>

@@ -33,6 +33,26 @@
       "destination": "/eu/orcamentos"
     },
     {
+      "source": "/toque",
+      "has": [
+        {
+          "type": "host",
+          "value": "eu.gustavodev.pt"
+        }
+      ],
+      "destination": "/eu/toque"
+    },
+    {
+      "source": "/toque-api/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "eu.gustavodev.pt"
+        }
+      ],
+      "destination": "https://toque-two.vercel.app/api/:path*"
+    },
+    {
       "source": "/vida/:path*",
       "destination": "/vida/index.html"
     },
