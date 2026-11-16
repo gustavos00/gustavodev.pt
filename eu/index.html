@@ -21,20 +21,32 @@
     </header>
     <h1 class="eu-title">Olá, Gustavo.</h1>
     <p class="eu-lede">Os teus projetos pessoais, com um só login.</p>
-    <div class="eu-world" id="world"></div>
+    <section class="eu-group" aria-labelledby="h-private">
+      <h2 class="eu-h2" id="h-private">Privado</h2>
+      <p class="eu-sub">Os teus dados. Só abrem com este login.</p>
+      <div class="eu-world" id="world-private"></div>
+    </section>
+    <section class="eu-group" aria-labelledby="h-public">
+      <h2 class="eu-h2" id="h-public">Público</h2>
+      <p class="eu-sub">Páginas que qualquer pessoa pode ver em gustavodev.pt.</p>
+      <div class="eu-world" id="world-public"></div>
+    </section>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
   <script src="/assets/eu-auth.js"></script>
   <script>
     // One card per project. A card with an href opens it; one without is shown as not on the web yet.
+    // Private cards need the portal sign-in; public ones are the pages anyone can read on gustavodev.pt.
     var PROJECTS = [
-      { kind: 'Casa', name: 'Orçamentos de caixilharia', text: 'Pedidos aos fornecedores do Forte da Casa, respostas e valores. Atualizado todos os dias a partir do Gmail.', href: '/orcamentos' },
-      { kind: 'App', name: 'Vida', text: 'Tarefas e dinheiro, um dia de cada vez. No iPhone e aqui na web, com a mesma conta.', href: '/vida' },
-      { kind: 'Casa', name: 'Toque', text: 'As tarefas da casa: o que está em atraso, o que falta confirmar hoje e os últimos toques nas etiquetas.', href: '/toque' },
-      { kind: 'Produto', name: 'Marmita', text: 'Página pública da Marmita.', href: 'https://marmita.gustavodev.pt' },
-      { kind: 'Ferramenta', name: 'Subagent City', text: 'A cidade onde as equipas de agentes trabalham.', href: 'https://gustavodev.pt/subagent-city' },
-      { kind: 'Pessoal', name: 'My animal', text: 'Página do projeto no site público.', href: 'https://gustavodev.pt/myanimal' },
+      { visibility: 'private', kind: 'Casa', name: 'Orçamentos de caixilharia', text: 'Pedidos aos fornecedores do Forte da Casa, respostas e valores. Atualizado todos os dias a partir do Gmail.', href: '/orcamentos' },
+      { visibility: 'private', kind: 'App', name: 'Vida', text: 'Tarefas e dinheiro, um dia de cada vez. No iPhone e aqui na web, com a mesma conta.', href: '/vida' },
+      { visibility: 'private', kind: 'Casa', name: 'Toque', text: 'As tarefas da casa: o que está em atraso, o que falta confirmar hoje e os últimos toques nas etiquetas.', href: '/toque' },
+      { visibility: 'public', kind: 'Portfólio', name: 'gustavodev.pt', text: 'A página inicial: quem sou, experiência e projetos.', href: 'https://gustavodev.pt' },
+      { visibility: 'public', kind: 'Produto', name: 'Toque', text: 'Apresentação do projeto, com ecrãs e código.', href: 'https://gustavodev.pt/toque' },
+      { visibility: 'public', kind: 'Produto', name: 'Marmita', text: 'Página pública da Marmita.', href: 'https://marmita.gustavodev.pt' },
+      { visibility: 'public', kind: 'Ferramenta', name: 'Subagent City', text: 'A cidade onde as equipas de agentes trabalham.', href: 'https://gustavodev.pt/subagent-city' },
+      { visibility: 'public', kind: 'Pessoal', name: 'My animal', text: 'Página do projeto no site público.', href: 'https://gustavodev.pt/myanimal' },
     ];
 
     (async function () {
@@ -44,9 +56,8 @@
         return;
       }
 
-      var world = document.getElementById('world');
-
       PROJECTS.forEach(function (project) {
+        var world = document.getElementById('world-' + project.visibility);
         var card = document.createElement(project.href ? 'a' : 'div');
         card.className = 'eu-tile';
 

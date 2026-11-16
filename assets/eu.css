@@ -130,6 +130,10 @@
   gap: 16px;
 }
 
+.eu-group {
+  margin-top: 40px;
+}
+
 .eu-tile {
   display: flex;
   flex-direction: column;
