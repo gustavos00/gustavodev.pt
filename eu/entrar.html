@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Entrar · eu</title>
+  <meta name="theme-color" content="#121212">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/style.css">
+  <link rel="stylesheet" href="/assets/eu.css">
+</head>
+<body>
+  <main class="eu-page">
+    <form class="eu-signin" id="signin" hidden>
+      <h1>eu</h1>
+      <p>Entra com a conta do Vida.</p>
+      <label class="eu-field" for="email">Email
+        <input id="email" type="email" autocomplete="email" autocapitalize="none" required>
+      </label>
+      <label class="eu-field" for="password">Palavra-passe
+        <input id="password" type="password" autocomplete="current-password" required>
+      </label>
+      <button class="eu-button" id="signin-button" type="submit">Entrar</button>
+      <p class="eu-error" id="signin-error" role="alert"></p>
+    </form>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="/assets/eu-auth.js"></script>
+  <script>
+    (async function () {
+      var form = document.getElementById('signin');
+      var errorText = document.getElementById('signin-error');
+      var button = document.getElementById('signin-button');
+
+      function goNext() {
+        var next = new URLSearchParams(location.search).get('next');
+        var safe = next && next.charAt(0) === '/' && next.charAt(1) !== '/' && next !== '/entrar' ? next : '/';
+        location.replace(safe);
+      }
+
+      // An expired token is refreshed here, so a returning visitor goes straight back.
+      var result = await window.euClient.auth.getSession();
+
+      if (result.data.session) {
+        goNext();
+        return;
+      }
+
+      form.hidden = false;
+      document.getElementById('email').focus();
+
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        button.disabled = true;
+        errorText.textContent = '';
+
+        var response = await window.euClient.auth.signInWithPassword({
+          email: document.getElementById('email').value.trim(),
+          password: document.getElementById('password').value,
+        });
+
+        button.disabled = false;
+
+        if (response.error) {
+          errorText.textContent = 'Email ou palavra-passe errados.';
+          return;
+        }
+
+        document.getElementById('password').value = '';
+        goNext();
+      });
+    })();
+  </script>
+</body>
+</html>

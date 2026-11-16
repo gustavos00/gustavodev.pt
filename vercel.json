@@ -4,7 +4,46 @@
   "rewrites": [
     {
       "source": "/",
-      "has": [{ "type": "host", "value": "marmita.gustavodev.pt" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "eu.gustavodev.pt"
+        }
+      ],
+      "destination": "/eu"
+    },
+    {
+      "source": "/entrar",
+      "has": [
+        {
+          "type": "host",
+          "value": "eu.gustavodev.pt"
+        }
+      ],
+      "destination": "/eu/entrar"
+    },
+    {
+      "source": "/orcamentos",
+      "has": [
+        {
+          "type": "host",
+          "value": "eu.gustavodev.pt"
+        }
+      ],
+      "destination": "/eu/orcamentos"
+    },
+    {
+      "source": "/vida/:path*",
+      "destination": "/vida/index.html"
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "marmita.gustavodev.pt"
+        }
+      ],
       "destination": "/marmita"
     },
     {
@@ -20,15 +59,60 @@
     },
     {
       "source": "/marmita",
-      "has": [{ "type": "host", "value": "gustavodev.pt" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "gustavodev.pt"
+        }
+      ],
       "destination": "https://marmita.gustavodev.pt/",
       "permanent": true
     },
     {
       "source": "/marmita",
-      "has": [{ "type": "host", "value": "www.gustavodev.pt" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "www.gustavodev.pt"
+        }
+      ],
       "destination": "https://marmita.gustavodev.pt/",
       "permanent": true
+    },
+    {
+      "source": "/eu/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "gustavodev.pt"
+        }
+      ],
+      "destination": "https://eu.gustavodev.pt/:path*",
+      "permanent": false
+    }
+  ],
+  "headers": [
+    {
+      "source": "/eu/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    },
+    {
+      "source": "/vida/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
     }
   ]
 }

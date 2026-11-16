@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>eu · gustavodev.pt</title>
+  <meta name="theme-color" content="#121212">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/style.css">
+  <link rel="stylesheet" href="/assets/eu.css">
+</head>
+<body>
+  <main class="eu-page">
+    <header class="eu-bar">
+      <a href="https://gustavodev.pt">gustavodev.pt</a>
+      <button type="button" id="signout">Sair</button>
+    </header>
+    <h1 class="eu-title">Olá, Gustavo.</h1>
+    <p class="eu-lede">Os teus projetos pessoais, com um só login.</p>
+    <div class="eu-world" id="world"></div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="/assets/eu-auth.js"></script>
+  <script>
+    // One card per project. A card with an href opens it; one without is shown as not on the web yet.
+    var PROJECTS = [
+      { kind: 'Casa', name: 'Orçamentos de caixilharia', text: 'Pedidos aos fornecedores do Forte da Casa, respostas e valores. Atualizado todos os dias a partir do Gmail.', href: '/orcamentos' },
+      { kind: 'App', name: 'Vida', text: 'Tarefas e dinheiro, um dia de cada vez. No iPhone e aqui na web, com a mesma conta.', href: '/vida' },
+      { kind: 'Produto', name: 'Toque', text: 'Tarefas com etiquetas NFC.', href: 'https://gustavodev.pt/toque' },
+      { kind: 'Produto', name: 'Marmita', text: 'Página pública da Marmita.', href: 'https://marmita.gustavodev.pt' },
+      { kind: 'Ferramenta', name: 'Subagent City', text: 'A cidade onde as equipas de agentes trabalham.', href: 'https://gustavodev.pt/subagent-city' },
+      { kind: 'Pessoal', name: 'My animal', text: 'Página do projeto no site público.', href: 'https://gustavodev.pt/myanimal' },
+    ];
+
+    (async function () {
+      var session = await window.requireSession();
+
+      if (!session) {
+        return;
+      }
+
+      var world = document.getElementById('world');
+
+      PROJECTS.forEach(function (project) {
+        var card = document.createElement(project.href ? 'a' : 'div');
+        card.className = 'eu-tile';
+
+        if (project.href) {
+          card.href = project.href;
+        }
+
+        [['eu-tile-kind', project.kind], ['eu-tile-name', project.name], ['eu-tile-text', project.href ? project.text : project.text + ' Ainda sem versão web.']].forEach(function (part) {
+          var span = document.createElement('span');
+          span.className = part[0];
+          span.textContent = part[1];
+          card.appendChild(span);
+        });
+
+        world.appendChild(card);
+      });
+
+      document.getElementById('signout').addEventListener('click', async function () {
+        await window.euClient.auth.signOut();
+        location.replace('/entrar');
+      });
+    })();
+  </script>
+</body>
+</html>

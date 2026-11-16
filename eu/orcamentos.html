@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Orçamentos · eu</title>
+  <meta name="theme-color" content="#121212">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/style.css">
+  <link rel="stylesheet" href="/assets/eu.css">
+</head>
+<body>
+  <main class="eu-page">
+    <header class="eu-bar">
+      <a href="/">← eu</a>
+      <button type="button" id="signout">Sair</button>
+    </header>
+
+    <h1 class="eu-title">Orçamentos de caixilharia · Forte da Casa</h1>
+    <p class="eu-lede" id="lede">A carregar os pedidos…</p>
+
+    <div class="eu-tiles">
+      <div class="eu-stat">
+        <span class="eu-stat-label">Pedidos enviados</span>
+        <span class="eu-stat-value" id="stat-sent">—</span>
+        <span class="eu-stat-note">por email, um por fornecedor</span>
+      </div>
+      <div class="eu-stat">
+        <span class="eu-stat-label">Responderam</span>
+        <span class="eu-stat-value" id="stat-replied">—</span>
+        <span class="eu-stat-note" id="stat-rate">—</span>
+      </div>
+      <div class="eu-stat">
+        <span class="eu-stat-label">Orçamentos com valor</span>
+        <span class="eu-stat-value" id="stat-quotes">—</span>
+        <span class="eu-stat-note">propostas com preço total</span>
+      </div>
+      <div class="eu-stat">
+        <span class="eu-stat-label">Valor mais baixo</span>
+        <span class="eu-stat-value" id="stat-lowest">—</span>
+        <span class="eu-stat-note" id="stat-lowest-company">ainda sem valores</span>
+      </div>
+    </div>
+
+    <section aria-labelledby="h-email">
+      <h2 class="eu-h2" id="h-email">Contactados por email</h2>
+      <p class="eu-sub" id="updated">—</p>
+      <div class="eu-controls" role="group" aria-label="Filtrar por estado">
+        <button class="eu-chip" type="button" data-filter="" aria-pressed="true">Todos</button>
+        <button class="eu-chip" type="button" data-filter="orcamento" aria-pressed="false">Orçamento recebido</button>
+        <button class="eu-chip" type="button" data-filter="respondeu" aria-pressed="false">Respondeu</button>
+        <button class="eu-chip" type="button" data-filter="sem_resposta" aria-pressed="false">Sem resposta</button>
+        <button class="eu-chip" type="button" data-filter="recusou" aria-pressed="false">Recusou</button>
+      </div>
+      <div class="eu-scroll">
+        <table class="eu-table">
+          <thead>
+            <tr>
+              <th>Fornecedor</th>
+              <th>Estado</th>
+              <th>Enviado</th>
+              <th>Resposta</th>
+              <th>Feedback</th>
+              <th class="eu-num">Valor</th>
+              <th>Email</th>
+            </tr>
+          </thead>
+          <tbody id="rows-email"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-phone">
+      <h2 class="eu-h2" id="h-phone">Sem email: contactar por telefone</h2>
+      <p class="eu-sub">Estas empresas não publicam email, por isso não receberam o pedido.</p>
+      <div class="eu-scroll">
+        <table class="eu-table">
+          <thead>
+            <tr>
+              <th>Fornecedor</th>
+              <th>Telefone</th>
+              <th class="eu-num">Distância</th>
+              <th>Nota</th>
+            </tr>
+          </thead>
+          <tbody id="rows-phone"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="/assets/eu-auth.js"></script>
+  <script>
+    (async function () {
+      var PROJECT = 'caixilharia-forte-da-casa';
+      var STATUS_LABEL = {
+        orcamento: 'Orçamento recebido',
+        respondeu: 'Respondeu',
+        sem_resposta: 'Sem resposta',
+        recusou: 'Recusou',
+        por_contactar: 'Por contactar',
+      };
+      var STATUS_ORDER = { orcamento: 0, respondeu: 1, sem_resposta: 2, recusou: 3 };
+      var formatEur = new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+      var formatDate = new Intl.DateTimeFormat('pt-PT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Lisbon' });
+      var rows = [];
+      var filter = '';
+
+      function showDate(value) {
+        if (!value) {
+          return '—';
+        }
+
+        var date = new Date(value);
+
+        return Number.isNaN(date.getTime()) ? '—' : formatDate.format(date);
+      }
+
+      function hasAmount(row) {
+        return row.amount_eur !== null && row.amount_eur !== undefined;
+      }
+
+      function addCell(tr, text, className) {
+        var td = document.createElement('td');
+
+        if (className) {
+          td.className = className;
+        }
+
+        td.textContent = text;
+        tr.appendChild(td);
+
+        return td;
+      }
+
+      function addCompany(tr, name, detail) {
+        var td = document.createElement('td');
+        var strong = document.createElement('span');
+        strong.className = 'eu-company';
+        strong.textContent = name;
+        var small = document.createElement('span');
+        small.className = 'eu-place';
+        small.textContent = detail;
+        td.append(strong, small);
+        tr.appendChild(td);
+      }
+
+      function showEmpty(tbody, columns, text) {
+        var tr = document.createElement('tr');
+        var td = addCell(tr, text, 'eu-empty');
+        td.colSpan = columns;
+        tbody.appendChild(tr);
+      }
+
+      function renderSummary(byEmail) {
+        var sent = byEmail.filter(function (r) { return r.sent_at; }).length;
+        var replied = byEmail.filter(function (r) { return r.replied_at; }).length;
+        var priced = byEmail.filter(hasAmount);
+        var lowest = priced.reduce(function (best, r) {
+          return best === null || Number(r.amount_eur) < Number(best.amount_eur) ? r : best;
+        }, null);
+
+        document.getElementById('stat-sent').textContent = String(sent);
+        document.getElementById('stat-replied').textContent = String(replied);
+        document.getElementById('stat-rate').textContent = sent ? Math.round((replied / sent) * 100) + '% dos pedidos' : '—';
+        document.getElementById('stat-quotes').textContent = String(priced.length);
+        document.getElementById('stat-lowest').textContent = lowest ? formatEur.format(Number(lowest.amount_eur)) : '—';
+        document.getElementById('stat-lowest-company').textContent = lowest ? lowest.company : 'ainda sem valores';
+
+        var lede = document.getElementById('lede');
+
+        if (replied === 0) {
+          lede.textContent = 'Pedido enviado a ' + sent + ' fornecedores. Ainda ninguém respondeu.';
+        } else {
+          lede.textContent = 'Pedido enviado a ' + sent + ' fornecedores. Responderam ' + replied + ', e ' + priced.length + (priced.length === 1 ? ' enviou' : ' enviaram') + ' valor.';
+        }
+
+        var latest = rows.reduce(function (max, r) { return r.updated_at > max ? r.updated_at : max; }, '');
+        document.getElementById('updated').textContent = latest ? 'Última verificação do Gmail: ' + showDate(latest) : '—';
+      }
+
+      function renderEmail(byEmail) {
+        var tbody = document.getElementById('rows-email');
+        tbody.replaceChildren();
+
+        var visible = byEmail
+          .filter(function (r) { return !filter || r.status === filter; })
+          .sort(function (a, b) {
+            return (STATUS_ORDER[a.status] ?? 9) - (STATUS_ORDER[b.status] ?? 9) || a.company.localeCompare(b.company, 'pt');
+          });
+
+        if (visible.length === 0) {
+          showEmpty(tbody, 7, 'Nenhum fornecedor neste estado.');
+          return;
+        }
+
+        visible.forEach(function (r) {
+          var tr = document.createElement('tr');
+          addCompany(tr, r.company, [r.locality, r.email].filter(Boolean).join(' · '));
+
+          var status = document.createElement('td');
+          var pill = document.createElement('span');
+          pill.className = 'eu-pill';
+          pill.dataset.status = r.status;
+          pill.textContent = STATUS_LABEL[r.status] || r.status;
+          status.appendChild(pill);
+          tr.appendChild(status);
+
+          addCell(tr, showDate(r.sent_at), 'eu-muted');
+          addCell(tr, showDate(r.replied_at), 'eu-muted');
+          addCell(tr, r.feedback || '—', r.feedback ? 'eu-feedback' : 'eu-muted');
+          addCell(tr, hasAmount(r) ? formatEur.format(Number(r.amount_eur)) : '—', 'eu-num');
+
+          var link = document.createElement('td');
+
+          if (typeof r.email_url === 'string' && r.email_url.indexOf('https://mail.google.com/') === 0) {
+            var a = document.createElement('a');
+            a.href = r.email_url;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.textContent = 'Abrir no Gmail';
+            link.appendChild(a);
+          } else {
+            link.className = 'eu-muted';
+            link.textContent = '—';
+          }
+
+          tr.appendChild(link);
+          tbody.appendChild(tr);
+        });
+      }
+
+      function renderPhone() {
+        var tbody = document.getElementById('rows-phone');
+        tbody.replaceChildren();
+
+        var byPhone = rows
+          .filter(function (r) { return r.channel === 'phone'; })
+          .sort(function (a, b) { return Number(a.distance_km) - Number(b.distance_km); });
+
+        if (byPhone.length === 0) {
+          showEmpty(tbody, 4, '—');
+          return;
+        }
+
+        byPhone.forEach(function (r) {
+          var tr = document.createElement('tr');
+          addCompany(tr, r.company, r.locality || '');
+          addCell(tr, r.phone || '—');
+          addCell(tr, r.distance_km === null ? '—' : String(r.distance_km).replace('.', ',') + ' km', 'eu-num');
+          addCell(tr, r.note || '—', r.note ? '' : 'eu-muted');
+          tbody.appendChild(tr);
+        });
+      }
+
+      function render() {
+        var byEmail = rows.filter(function (r) { return r.channel === 'email'; });
+        renderSummary(byEmail);
+        renderEmail(byEmail);
+        renderPhone();
+      }
+
+      document.querySelectorAll('[data-filter]').forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          filter = chip.dataset.filter;
+          document.querySelectorAll('[data-filter]').forEach(function (other) {
+            other.setAttribute('aria-pressed', String(other === chip));
+          });
+          render();
+        });
+      });
+
+      document.getElementById('signout').addEventListener('click', async function () {
+        await window.euClient.auth.signOut();
+        location.replace('/entrar');
+      });
+
+      var session = await window.requireSession();
+
+      if (!session) {
+        return;
+      }
+
+      var result = await window.euClient
+        .from('quote_requests')
+        .select('company, locality, channel, email, phone, distance_km, note, status, sent_at, replied_at, feedback, amount_eur, email_url, updated_at')
+        .eq('project', PROJECT);
+
+      if (result.error) {
+        document.getElementById('lede').textContent = 'Não foi possível carregar os pedidos. Recarrega a página; se continuar, volta a entrar.';
+        return;
+      }
+
+      rows = result.data;
+      render();
+    })();
+  </script>
+</body>
+</html>
