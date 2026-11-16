@@ -52,6 +52,7 @@
       <div class="eu-controls" role="group" aria-label="Filtrar por estado">
         <button class="eu-chip" type="button" data-filter="" aria-pressed="true">Todos</button>
         <button class="eu-chip" type="button" data-filter="orcamento" aria-pressed="false">Orçamento recebido</button>
+        <button class="eu-chip" type="button" data-filter="a_aguardar" aria-pressed="false">A aguardar resposta</button>
         <button class="eu-chip" type="button" data-filter="respondeu" aria-pressed="false">Respondeu</button>
         <button class="eu-chip" type="button" data-filter="sem_resposta" aria-pressed="false">Sem resposta</button>
         <button class="eu-chip" type="button" data-filter="recusou" aria-pressed="false">Recusou</button>
@@ -102,10 +103,11 @@
         orcamento: 'Orçamento recebido',
         respondeu: 'Respondeu',
         sem_resposta: 'Sem resposta',
+        a_aguardar: 'A aguardar resposta',
         recusou: 'Recusou',
         por_contactar: 'Por contactar',
       };
-      var STATUS_ORDER = { orcamento: 0, respondeu: 1, sem_resposta: 2, recusou: 3 };
+      var STATUS_ORDER = { orcamento: 0, respondeu: 1, a_aguardar: 2, sem_resposta: 3, recusou: 4 };
       var formatEur = new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
       var formatDate = new Intl.DateTimeFormat('pt-PT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Lisbon' });
       var rows = [];

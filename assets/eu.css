@@ -326,6 +326,11 @@ a.eu-tile:focus-visible {
   border-color: #6b5a33;
 }
 
+.eu-pill[data-status="a_aguardar"] {
+  color: #9cc0e8;
+  border-color: #34506b;
+}
+
 .eu-pill[data-status="recusou"] {
   color: #e88a7d;
   border-color: #6b3a33;
