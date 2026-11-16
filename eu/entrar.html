@@ -42,12 +42,20 @@
         location.replace(safe);
       }
 
-      // An expired token is refreshed here, so a returning visitor goes straight back.
+      // An expired token is refreshed here, so a returning visitor goes straight back. A session the
+      // server no longer knows (signed out elsewhere, or revoked) still reads as one locally, and going
+      // back with it would bounce off the middleware forever, so it is checked with Supabase and dropped.
       var result = await window.euClient.auth.getSession();
 
       if (result.data.session) {
-        goNext();
-        return;
+        var user = await window.euClient.auth.getUser();
+
+        if (user.data.user) {
+          goNext();
+          return;
+        }
+
+        await window.euClient.auth.signOut({ scope: 'local' });
       }
 
       form.hidden = false;
