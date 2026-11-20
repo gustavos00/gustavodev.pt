@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Relatório de orçamentos · eu</title>
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+<style>
+  /* Layout: one reading column (~760px) for the verdict and reasoning; the price chart and the comparison table run wider. */
+  :root {
+    --paper: #f6f7f5;
+    --panel: #ffffff;
+    --ink: #1c2321;
+    --soft: #55605c;
+    --faint: #8a948f;
+    --rule: #dde2df;
+    --accent: #2f6f62;
+    --accent-soft: #e2efeb;
+    --estimate: #b9d6ce;
+    --muted-bar: #c9d0cc;
+    --good: #2f7a46;
+    --warn: #9a6a12;
+    --bad: #a63d32;
+    --serif: "Source Serif 4", Georgia, serif;
+    --sans: "IBM Plex Sans", -apple-system, "Helvetica Neue", Arial, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #131715; --panel: #1a1f1d; --ink: #e8ece9; --soft: #a9b3ae; --faint: #7d8782; --rule: #2b322f;
+      --accent: #7cc2b0; --accent-soft: #1f2f2a; --estimate: #35584f; --muted-bar: #3a423e; --good: #7cc98f; --warn: #e0b45a; --bad: #ec8a7e;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #131715; --panel: #1a1f1d; --ink: #e8ece9; --soft: #a9b3ae; --faint: #7d8782; --rule: #2b322f;
+    --accent: #7cc2b0; --accent-soft: #1f2f2a; --estimate: #35584f; --muted-bar: #3a423e; --good: #7cc98f; --warn: #e0b45a; --bad: #ec8a7e;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+  .wrap {
+    max-width: 1120px; margin: 0 auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 40px 72px;
+    display: flex; flex-direction: column; gap: 48px;
+  }
+  .col { max-width: 780px; }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 600; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(28px, 4vw, 38px); line-height: 1.15; }
+  h2 { font-size: 24px; line-height: 1.25; margin-bottom: 12px; }
+  h3 { font-size: 18px; line-height: 1.3; }
+  p { margin: 0; }
+  .eyebrow { font: 500 12px/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); }
+  .lede { font-size: 18px; color: var(--soft); margin-top: 12px; }
+  .meta { font-size: 14px; color: var(--faint); margin-top: 8px; }
+  .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .note { font-size: 13px; color: var(--faint); }
+
+  .verdict { background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+  .verdict ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+  .pick { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .pick > div { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px; min-width: 0; }
+  .pick .label { font: 500 12px/1.4 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); }
+  .pick .name { font: 600 19px/1.3 var(--serif); margin-top: 4px; }
+  .pick .why { font-size: 14px; color: var(--soft); margin-top: 4px; }
+
+  .bars { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+  .bar-row { display: grid; grid-template-columns: 150px 1fr; gap: 12px; align-items: center; }
+  .bar-name { font-weight: 500; font-size: 15px; }
+  .bar-track { position: relative; height: 30px; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+  .bar-quoted { position: absolute; inset: 0 auto 0 0; background: var(--accent); }
+  .bar-quoted.out { background: var(--muted-bar); }
+  .bar-extra { position: absolute; top: 0; bottom: 0; background: var(--estimate); }
+  .bar-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; font: 500 13px/1 var(--mono); color: var(--ink); }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: var(--soft); margin-top: 6px; }
+  .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; }
+  .axis { display: grid; grid-template-columns: 150px 1fr; gap: 12px; font: 12px/1 var(--mono); color: var(--faint); }
+  .axis-ticks { display: flex; justify-content: space-between; }
+
+  .scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 12px; background: var(--panel); }
+  table { border-collapse: collapse; width: 100%; min-width: 1180px; font-size: 13.5px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+  thead th { font: 600 11.5px/1.3 var(--sans); text-transform: uppercase; letter-spacing: 0.05em; color: var(--faint); background: var(--paper); white-space: nowrap; }
+  tbody th { font-weight: 600; white-space: nowrap; }
+  tbody th small { display: block; font-weight: 400; color: var(--faint); }
+  tr:last-child th, tr:last-child td { border-bottom: 0; }
+  .ok { color: var(--good); }
+  .warn { color: var(--warn); }
+  .bad { color: var(--bad); }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .card { background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .card .price { font: 600 21px/1.1 var(--serif); font-variant-numeric: tabular-nums; }
+  .chip { display: inline-block; font: 500 12px/1 var(--sans); padding: 5px 9px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+  .card p.body { font-size: 14px; color: var(--soft); }
+  .group-title { font: 500 12px/1.4 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); margin: 8px 0 12px; }
+
+  ol.next { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; }
+  .sources { font-size: 14px; color: var(--soft); padding-left: 20px; }
+  .sources li { margin-bottom: 6px; overflow-wrap: anywhere; }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+
+  @media (max-width: 560px) {
+    .bar-row, .axis { grid-template-columns: 100px 1fr; }
+    .bar-name { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap" style="padding-block:24px 0;gap:0">
+  <nav style="display:flex;justify-content:space-between;gap:16px;font-size:14px"><a href="/orcamentos">← Painel de orçamentos</a><a href="/">eu</a></nav>
+</div>
+
+<div class="wrap">
+  <header class="col">
+    <p class="eyebrow">Forte da Casa · desenho CX-001 · 8 vãos</p>
+    <h1>Caixilharia em PVC: qual orçamento compensa</h1>
+    <p class="lede">Já chegaram 11 orçamentos: 10 por email e o da Caixinexo, por WhatsApp. Li cada PDF linha a linha e comparei-os com o que pediste: perfil, ferragem, vidro, estores, os vãos que incluem, garantias, prazos e condições.</p>
+    <p class="meta">Atualizado a 20/11/2026, com as propostas recebidas até às 18h50. Bidri, Janelar e CaixiMáximus ainda não mandaram valor.</p>
+  </header>
+
+  <section class="verdict col" aria-labelledby="veredito">
+    <h2 id="veredito" style="margin:0">Melhor qualidade/preço: Fabríu</h2>
+    <p>A Fabríu dá o mesmo material das propostas boas (perfil Cortizo A70/C70, ferragem Roto NX, vidro Guardian Sun 4/16/4) e é a mais barata que traz <b>tudo o que pediste</b>: as 3 portas de sacada de correr, a cozinha de correr com 3 folhas, os 6 estores e os tubos de canto, por <b class="num">10 008 €</b> com IVA. É também a empresa mais bem avaliada da lista (4,9 ★ em 269 avaliações), a proposta vale até 18/12 e o pagamento fica 10% para o fim.</p>
+    <ul>
+      <li>A diferenciar: a janela do WC veio fixa e tem 250 € de "materiais adicionais" sem descrição. Os estores são interiores, de fita, com caixa sem isolamento.</li>
+      <li>Para negociar: a VIP Janelas tem o mesmo material por 8 186 € sem estores. Se a VIP orçar os estores abaixo de ~1 800 €, fica mais barata do que a Fabríu.</li>
+    </ul>
+    <div class="pick">
+      <div>
+        <p class="label">Mais barata, se juntar estores</p>
+        <p class="name">VIP Janelas</p>
+        <p class="why">8 186 € sem estores, ~10 000 € com eles. A 500 m da obra, válida até 17/12.</p>
+      </div>
+      <div>
+        <p class="label">Se quiseres o melhor material</p>
+        <p class="name">Fruvel</p>
+        <p class="why">Salamander e vidro Planitherm 4S, com estores térmicos e tudo incluído, a 400 m da obra. Custa 14 093 €, mais 4 000 € do que a Fabríu.</p>
+      </div>
+      <div>
+        <p class="label">Se quiseres estores motorizados</p>
+        <p class="name">Windoor Alverca</p>
+        <p class="why">A única com motor e vidro de 6 mm. Falta orçar 2 das 3 portas; corrigido, ronda 11 160 €.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="precos">
+    <div class="col">
+      <h2 id="precos">Preço total com IVA</h2>
+      <p class="note">A barra cheia é o valor da proposta. A parte clara é a minha estimativa do que falta para o âmbito pedido. As barras cinzentas são as propostas que desaconselho.</p>
+    </div>
+    <div class="bars" role="img" aria-label="Preços com IVA, do mais barato ao mais caro: VIP 8 186 euros mais cerca de 1 890 de estores; Windoor 9 466 mais cerca de 1 690 de portas; Fabríu 10 008; Aroplast 10 070; Comfort Plus 10 468; Caixilho PVC 11 764; D&amp;S 11 870; Janellux 12 103; Caixinexo 13 831; Fruvel 14 093; Janelas Perfeitas cerca de 16 225.">
+      <div class="axis" aria-hidden="true"><span></span><div class="axis-ticks"><span>0 €</span><span>5 000</span><span>10 000</span><span>15 000</span></div></div>
+      <div class="bar-row"><span class="bar-name">VIP Janelas</span><div class="bar-track"><div class="bar-quoted" style="width:48.15%"></div><div class="bar-extra" style="left:48.15%;width:11.12%"></div><span class="bar-text">8 186 € + ~1 890</span></div></div>
+      <div class="bar-row"><span class="bar-name">Windoor</span><div class="bar-track"><div class="bar-quoted" style="width:55.68%"></div><div class="bar-extra" style="left:55.68%;width:9.94%"></div><span class="bar-text">9 466 € + ~1 690</span></div></div>
+      <div class="bar-row"><span class="bar-name">Fabríu</span><div class="bar-track"><div class="bar-quoted" style="width:58.87%"></div><span class="bar-text">10 008 €</span></div></div>
+      <div class="bar-row"><span class="bar-name">Aroplast</span><div class="bar-track"><div class="bar-quoted out" style="width:59.24%"></div><span class="bar-text">10 070 € + deslocação</span></div></div>
+      <div class="bar-row"><span class="bar-name">Comfort Plus</span><div class="bar-track"><div class="bar-quoted" style="width:61.58%"></div><span class="bar-text">10 468 €</span></div></div>
+      <div class="bar-row"><span class="bar-name">Caixilho PVC</span><div class="bar-track"><div class="bar-quoted" style="width:69.20%"></div><span class="bar-text">11 764 €</span></div></div>
+      <div class="bar-row"><span class="bar-name">D&amp;S</span><div class="bar-track"><div class="bar-quoted out" style="width:69.82%"></div><span class="bar-text">11 870 €</span></div></div>
+      <div class="bar-row"><span class="bar-name">Janellux</span><div class="bar-track"><div class="bar-quoted" style="width:71.19%"></div><span class="bar-text">12 103 €</span></div></div>
+      <div class="bar-row"><span class="bar-name">Caixinexo</span><div class="bar-track"><div class="bar-quoted out" style="width:81.36%"></div><span class="bar-text">13 831 €</span></div></div>
+      <div class="bar-row"><span class="bar-name">Fruvel</span><div class="bar-track"><div class="bar-quoted" style="width:82.90%"></div><span class="bar-text">14 093 €</span></div></div>
+      <div class="bar-row"><span class="bar-name">Janelas Perfeitas</span><div class="bar-track"><div class="bar-quoted out" style="width:95.44%"></div><span class="bar-text">~16 225 €</span></div></div>
+      <div class="axis" aria-hidden="true"><span></span><div class="axis-ticks"><span></span><span></span><span></span><span>17 000 €</span></div></div>
+      <div class="legend">
+        <span><span class="sw" style="background:var(--accent)"></span>Valor da proposta</span>
+        <span><span class="sw" style="background:var(--estimate)"></span>Estimativa do que falta</span>
+        <span><span class="sw" style="background:var(--muted-bar)"></span>Desaconselhada</span>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="comparacao">
+    <h2 id="comparacao">Comparação lado a lado</h2>
+    <p class="note" style="margin-bottom:12px">Ordenado por preço. Em verde o que cumpre bem, em amarelo o que fica abaixo ou não está claro, em vermelho o que falta ou contraria o pedido.</p>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Fornecedor</th>
+            <th scope="col">Total c/ IVA</th>
+            <th scope="col">Perfil</th>
+            <th scope="col">Ferragem</th>
+            <th scope="col">Vidro</th>
+            <th scope="col">Estores</th>
+            <th scope="col">Âmbito face ao pedido</th>
+            <th scope="col">Garantias</th>
+            <th scope="col">Prazo</th>
+            <th scope="col">Validade</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">VIP Janelas<small>n.º 3348 · 0,5 km · 4,9 ★ (11)</small></th>
+            <td class="num">8 186 €</td>
+            <td class="ok">Cortizo A70 / C70</td>
+            <td class="ok">Roto NX</td>
+            <td>Guardian Sun 4/16/4</td>
+            <td class="bad">Não incluídos</td>
+            <td><span class="bad">Sem estores</span>; <span class="warn">WC fixo</span>; 3 portas ✓</td>
+            <td>Perfil 10 · ferr. 3 · <span class="warn">vidro 2</span></td>
+            <td>30 d. úteis</td>
+            <td class="ok">17/12</td>
+          </tr>
+          <tr>
+            <th scope="row">Windoor Alverca<small>WA-M-641 · 3,9 km · 5,0 ★ (14)</small></th>
+            <td class="num">9 466 €</td>
+            <td class="ok">Cortizo A70 / C70</td>
+            <td class="warn">Roto NX (condições dizem Endow)</td>
+            <td class="ok">Guardian Sun 6/14/4</td>
+            <td class="ok">Monobloco com motor</td>
+            <td><span class="bad">1 porta de sacada em vez de 3</span>; WC oscilobatente fosco ✓</td>
+            <td>10 · 3 · 3</td>
+            <td class="ok">15 d. úteis</td>
+            <td>~16/12</td>
+          </tr>
+          <tr>
+            <th scope="row">Fabríu<small>FB-10626 · 8,4 km · 4,9 ★ (269)</small></th>
+            <td class="num">10 008 €</td>
+            <td class="ok">Cortizo A70 / C70</td>
+            <td class="ok">Roto NX</td>
+            <td>Guardian Sun 4/16/4</td>
+            <td class="warn">Compactos interiores, fita, caixa sem isolamento</td>
+            <td>Tudo incluído; <span class="warn">WC fixo, 250 € sem descrição</span></td>
+            <td>10 · 3 · 3 · estores 3</td>
+            <td>15–25 d. úteis</td>
+            <td class="ok">~18/12</td>
+          </tr>
+          <tr>
+            <th scope="row">Aroplast<small>2026-11034 · 22,6 km · 4,7 ★ (62)</small></th>
+            <td class="num">10 070 €</td>
+            <td class="warn">Aluplast Ideal 4000 (Uf 1,3)</td>
+            <td class="warn">Axor</td>
+            <td>Guardian Sun 4/16/4</td>
+            <td>Compactos exteriores, manuais</td>
+            <td><span class="warn">Montagem só incluída em Lisboa</span>; valor aproximado</td>
+            <td>10 · 3 · 3 · estores 2</td>
+            <td class="warn">6–10 semanas</td>
+            <td class="bad">Expirada</td>
+          </tr>
+          <tr>
+            <th scope="row">Comfort Plus<small>TF-801 · 3,3 km · 5,0 ★ (8)</small></th>
+            <td class="num">10 468 €</td>
+            <td class="ok">Cortizo A70 / C70</td>
+            <td class="ok">Roto NX</td>
+            <td>Guardian Sun 4/16/4</td>
+            <td class="warn">Compactos interiores, fita</td>
+            <td>Tudo incluído; <span class="warn">WC fixo sem fosco</span></td>
+            <td>10 · 3 · 3</td>
+            <td>25 d. úteis</td>
+            <td class="warn">~30/11</td>
+          </tr>
+          <tr>
+            <th scope="row">Caixilho PVC<small>n.º 2484 · 29,8 km · 4,5 ★ (102)</small></th>
+            <td class="num">11 764 €</td>
+            <td class="warn">Aluplast Ideal 4000 / Multi-Sliding</td>
+            <td class="ok">Winkhaus ActivePilot</td>
+            <td class="ok">4/16/4 árgon, Ug 1,1</td>
+            <td>Compactos, fita</td>
+            <td><span class="warn">Portas de sacada em batente, não de correr</span>; remoção incluída</td>
+            <td class="ok">10 · 5 · 5 · estores 3</td>
+            <td>5–6 semanas</td>
+            <td class="warn">~28/11</td>
+          </tr>
+          <tr>
+            <th scope="row">D&amp;S Caixilharia<small>100 730 · 14,8 km · 4,5 ★ (192)</small></th>
+            <td class="num">11 870 €</td>
+            <td class="ok">Deceuninck Elegant ThermoFibra (Uf 0,88)</td>
+            <td class="warn">Axor</td>
+            <td class="ok">Guardian Sun 6/14/4 árgon</td>
+            <td>Compactos PVC, manuais</td>
+            <td><span class="bad">Marquises todas de correr; V2 sem o painel inferior</span></td>
+            <td class="bad">Não indica</td>
+            <td>Não indica</td>
+            <td>Não indica</td>
+          </tr>
+          <tr>
+            <th scope="row">Janellux<small>26006/26 · 13,9 km · 4,5 ★ (90)</small></th>
+            <td class="num">12 103 €</td>
+            <td class="ok">Cortizo A70 (0,9)</td>
+            <td class="ok">Siegenia</td>
+            <td class="warn">Climaguard Premium, sem controlo solar</td>
+            <td class="ok">Compactos exteriores</td>
+            <td>Tudo incluído; <span class="warn">WC fixo</span>; remoção incluída</td>
+            <td>10 · 5 · <span class="warn">vidro 2</span></td>
+            <td>20–25 d. úteis</td>
+            <td class="warn">~24/11</td>
+          </tr>
+          <tr>
+            <th scope="row">Caixinexo<small>234118 · WhatsApp · Almada</small></th>
+            <td class="num">13 831 €</td>
+            <td class="ok">Cortizo A70 / C70</td>
+            <td class="ok">Roto NX</td>
+            <td>Guardian Sun 4/16/4</td>
+            <td class="ok">Estores térmicos</td>
+            <td><span class="bad">Falta o WC</span>; <span class="warn">cozinha em batente</span>; montagem não discriminada</td>
+            <td class="bad">3 anos para tudo</td>
+            <td>4–8 semanas</td>
+            <td>Não indica</td>
+          </tr>
+          <tr>
+            <th scope="row">Fruvel<small>1261166 · 0,4 km · 4,2 ★ (37)</small></th>
+            <td class="num">14 093 €</td>
+            <td class="ok">Salamander proEvolution 72 / EvolutionDrive</td>
+            <td class="ok">Roto NX</td>
+            <td class="ok">Planitherm 4S 4/14/6</td>
+            <td class="ok">Térmicos compactos</td>
+            <td>Tudo incluído; <span class="warn">WC sem fosco</span>; remoção à parte</td>
+            <td class="warn">Não indica</td>
+            <td>Não indica</td>
+            <td class="warn">~2/12</td>
+          </tr>
+          <tr>
+            <th scope="row">Janelas Perfeitas<small>17 712 · 16,3 km · 4,8 ★ (237)</small></th>
+            <td class="num">~16 225 €</td>
+            <td>Cortizo (série não indicada)</td>
+            <td class="ok">Roto</td>
+            <td class="ok">Guardian Sun 4/18/6</td>
+            <td>Compactos de fita</td>
+            <td><span class="bad">Cozinha sem estore; falta o F1; portas em batente</span></td>
+            <td class="warn">6 anos para tudo</td>
+            <td class="warn">8–12 semanas</td>
+            <td>~4/12</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="porque">
+    <h2 id="porque">Porquê, fornecedor a fornecedor</h2>
+
+    <p class="group-title">A considerar</p>
+    <div class="cards">
+      <article class="card">
+        <div class="card-head"><h3>Fabríu</h3><span class="chip ok">Recomendado</span></div>
+        <p class="price num">10 008 €</p>
+        <p class="body">Material de primeira linha (Cortizo, Roto NX, Guardian Sun) com 20% de desconto nas estruturas. Tem todos os vãos tal como os pediste, incluindo as portas e a cozinha de correr. A montagem custa 1 750 € com IVA a 6%. Pagamento 50/40/10. É a mais avaliada da lista e a proposta tem um mês de validade. A corrigir: WC fixo, a linha de 250 € sem explicação e estores interiores sem caixa isolada; a caixa isolada é possível, mas com novo orçamento.</p>
+      </article>
+      <article class="card">
+        <div class="card-head"><h3>VIP Janelas</h3><span class="chip">Alternativa mais barata</span></div>
+        <p class="price num">8 186 €<span class="note"> · ~10 000 € com estores</span></p>
+        <p class="body">O mesmo material da Fabríu, com a montagem mais barata (970 €) e a 500 m da obra. Falta o essencial: estores e caixas. O WC vem fixo e a garantia do vidro é de 2 anos. É uma boa base para negociar com a Fabríu, ou para escolher se os estores vierem baratos.</p>
+      </article>
+      <article class="card">
+        <div class="card-head"><h3>Comfort Plus</h3><span class="chip">Completa</span></div>
+        <p class="price num">10 468 €</p>
+        <p class="body">O mesmo material e o mesmo tipo de estores que a Fabríu, mas 460 € mais cara, com menos avaliações e uma validade que acaba por volta de 30/11. Só faz sentido se a Fabríu falhar.</p>
+      </article>
+      <article class="card">
+        <div class="card-head"><h3>Windoor Alverca</h3><span class="chip">Mais equipada</span></div>
+        <p class="price num">9 466 €<span class="note"> · ~11 160 € com 3 portas</span></p>
+        <p class="body">A única com estores motorizados e vidro de 6 mm por fora, que isola melhor do ruído. É também a produção mais rápida. Orçou só 1 das 3 portas de sacada e a ferragem não está clara (Roto ou Endow). A marca tem reclamações no Portal da Queixa.</p>
+      </article>
+      <article class="card">
+        <div class="card-head"><h3>Fruvel</h3><span class="chip">Material topo de gama</span></div>
+        <p class="price num">14 093 €</p>
+        <p class="body">Perfil Salamander proEvolution 72 com correr EvolutionDrive, ferragem Roto NX, vidro Planitherm 4S e estores térmicos em todos os vãos. Cobre tudo o que pediste e fica a 400 m. Custa 4 000 € mais do que a Fabríu e põe IVA a 23% em tudo; se separar a montagem a 6%, desce. Não indica garantias nem prazo, por isso é preciso pedir.</p>
+      </article>
+      <article class="card">
+        <div class="card-head"><h3>Janellux</h3><span class="chip">Completa, mais cara</span></div>
+        <p class="price num">12 103 €</p>
+        <p class="body">Cortizo com ferragem Siegenia e estores exteriores, remoção e deslocação incluídas. O vidro Climaguard não tem controlo solar, ao contrário do Guardian Sun dos outros. Vidro com 2 anos de garantia, WC fixo e validade de só 7 dias.</p>
+      </article>
+      <article class="card">
+        <div class="card-head"><h3>Caixilho PVC</h3><span class="chip">Boas garantias</span></div>
+        <p class="price num">11 764 €</p>
+        <p class="body">Perfil Aluplast, um degrau abaixo do Cortizo, mas com ferragem Winkhaus e vidro com árgon (Ug 1,1). As garantias são as melhores da lista (5 anos em ferragem e vidro) e a remoção está incluída. As portas de sacada vêm em batente, não de correr como pediste.</p>
+      </article>
+    </div>
+
+    <p class="group-title" style="margin-top:28px">Desaconselhadas</p>
+    <div class="cards">
+      <article class="card">
+        <div class="card-head"><h3>Aroplast</h3><span class="chip bad">Não</span></div>
+        <p class="price num">10 070 € + deslocação</p>
+        <p class="body">Perfil e ferragem de gama inferior pelo preço dos Cortizo. A montagem só está incluída em Lisboa e a proposta já expirou.</p>
+      </article>
+      <article class="card">
+        <div class="card-head"><h3>D&amp;S Caixilharia</h3><span class="chip bad">Não</span></div>
+        <p class="price num">11 870 €</p>
+        <p class="body">O melhor perfil no papel (Deceuninck ThermoFibra, Uf 0,88), mas com ferragem Axor. Pôs as marquises todas de correr, contra o que pediste, e a V2 sem o painel inferior. Não indica garantias nem prazos, e a empresa tem várias reclamações no Portal da Queixa.</p>
+      </article>
+      <article class="card">
+        <div class="card-head"><h3>Caixinexo</h3><span class="chip bad">Não</span></div>
+        <p class="price num">13 831 €</p>
+        <p class="body">Bom material (Cortizo, Roto NX, estores térmicos), mas falta a janela do WC e a cozinha vem em batente. A montagem não está discriminada e o IVA é todo a 23%. A garantia é de 3 anos para tudo, contra 10 anos de perfil nas outras.</p>
+      </article>
+      <article class="card">
+        <div class="card-head"><h3>Janelas Perfeitas</h3><span class="chip bad">Não</span></div>
+        <p class="price num">~16 225 €</p>
+        <p class="body">A mais cara, mesmo depois da visita e já com 10% de desconto e a cozinha em oscilobatente, como escolheste. Ainda assim mudou o âmbito: cozinha sem estore, portas em batente e sem o vidro fixo F1. Não indica o total com IVA (calculei com 23%) e o prazo é de 8 a 12 semanas.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="col" aria-labelledby="proximos">
+    <h2 id="proximos">Próximos passos sugeridos</h2>
+    <ol class="next">
+      <li><b>Fabríu:</b> pedir a janela do WC oscilobatente com vidro fosco, explicação dos 250 € na linha do WC e o preço com estores de caixa isolada (térmicos). Confirmar se a remoção das janelas antigas de alumínio está incluída.</li>
+      <li><b>VIP Janelas:</b> pedir os mesmos estores (térmicos, com caixa) para C1, V1 e V2, o WC oscilobatente fosco e 3 anos de garantia no vidro. Com esse número, comparar com a Fabríu.</li>
+      <li><b>Fruvel:</b> se quiseres a opção topo de gama, pedir as garantias e o prazo por escrito, e a montagem separada com IVA a 6%.</li>
+      <li>Ainda sem valor: Bidri (propõe visita, terças e quintas), Janelar (em preparação) e CaixiMáximus (pediu o teu telefone).</li>
+      <li>Em qualquer adjudicação: a medição final é feita pelo técnico deles, e o valor pode mudar com as medidas reais.</li>
+    </ol>
+  </section>
+
+  <section class="col" aria-labelledby="fontes">
+    <h2 id="fontes">Fontes</h2>
+    <ul class="sources">
+      <li><b>Fabríu</b>: proposta FB-10626 de 18/11/2026 (13 páginas), com as fichas Cortizo A70 e Guardian.</li>
+      <li><b>VIP Janelas</b>: orçamento n.º 3348 de 17/11/2026.</li>
+      <li><b>Windoor Alverca</b>: orçamento WA-M-641 de 16/11/2026, com as fichas Cortizo A70, C70 e GuardianSun 6-14-4.</li>
+      <li><b>Comfort Plus</b>: orçamento TF-801 de 16/11/2026.</li>
+      <li><b>Aroplast</b>: proposta n.º 2026-11034 de 17/11/2026, com as fichas Ideal 4000 e Vario Slide.</li>
+      <li><b>Caixilho PVC</b>: proposta n.º 2484 (OFR/2484-GS2) de 18/11/2026, com os desenhos técnicos. O total com IVA usa 23% nos materiais e 6% na montagem, como a proposta indica.</li>
+      <li><b>D&amp;S Caixilharia</b>: orçamento 100 730/1 de 20/11/2026.</li>
+      <li><b>Janellux</b>: orçamento 26006/26 de 17/11/2026.</li>
+      <li><b>Caixinexo</b>: orçamento 234118 de 17/11/2026, recebido por WhatsApp.</li>
+      <li><b>Fruvel</b>: orçamento 1261166/1 de 17/11/2026, com a ficha Salamander proEvolution 72 e o certificado Roto NX.</li>
+      <li><b>Janelas Perfeitas</b>: orçamento 17 712/1 de 19/11/2026. O documento dá 14 656,68 € sem IVA e 13 191,01 € com o desconto de 10%, já com a cozinha em oscilobatente (pos. 2): a versão de correr (pos. 1, 1 902,35 €) aparece a 0,00 e não entra no total. Não indica a taxa de IVA; o valor com IVA (~16 225 €) é calculado a 23% sobre o valor com desconto.</li>
+      <li><b>Valores de isolamento (Uf, Ug)</b>: os declarados nas propostas e fichas técnicas dos fornecedores (Cortizo A70 0,9; Aluplast 1,3; Deceuninck ThermoFibra 0,88; Salamander proEvolution 1,1; vidro Caixilho PVC Ug 1,1).</li>
+      <li><b>Avaliações, distâncias e reclamações</b>: a folha de empresas da obra, feita a 12/11/2026 a partir do Google Maps e dos sites. A Caixinexo não está nessa folha.</li>
+      <li><b>Estimativas</b>: os estores da VIP somam os estores orçados pela Comfort Plus (1 537 € + IVA) e pela Aroplast (1 369 € + IVA). As 2 portas da Windoor usam o preço que ela deu para uma porta (687,47 € + IVA cada).</li>
+    </ul>
+    <p class="note" style="margin-top:12px">Os PDFs das propostas estão guardados com os emails de cada fornecedor. Todos os valores podem mudar depois da medição em obra.</p>
+  </section>
+</div>
+
+</body>
+</html>
