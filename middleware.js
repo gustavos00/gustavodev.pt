@@ -1,12 +1,12 @@
 // Vercel Routing Middleware: everything on eu.gustavodev.pt (and /eu/*, /vida/* on any host) needs a
 // signed-in Vida session, checked here before any page is served, and refreshed here when its hour-long
-// access token has expired. Only the sign-in page is open.
+// access token has expired. Only the sign-in page and the quotes report (no personal data) are open.
 // The session is the one assets/eu-auth.js keeps in the gd-auth.* cookies on .gustavodev.pt.
 
 const SUPABASE_URL = 'https://fdmhaiwrechavluumeym.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_TC_D6gGODob7Tp7Ea-zWXg_Rwh7HJX1';
 const PROTECTED_HOSTS = new Set(['eu.gustavodev.pt']);
-const OPEN_PATHS = new Set(['/entrar', '/eu/entrar']);
+const OPEN_PATHS = new Set(['/entrar', '/eu/entrar', '/relatorio', '/eu/relatorio']);
 // Private pages whose path is also a public page's. Vercel serves a matching file before it reads the
 // rewrites in vercel.json, so on the portal host these are rewritten here, ahead of the file system.
 const PRIVATE_TWINS = new Map([['/toque', '/eu/toque']]);
