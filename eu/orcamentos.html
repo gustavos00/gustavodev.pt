@@ -68,7 +68,6 @@
               <th>Resposta</th>
               <th>Feedback</th>
               <th class="eu-num">Valor</th>
-              <th class="eu-num" title="Total sem as 3 portas de sacada: marquises com estores, cozinha, WC e vidro fixo">Janelas exteriores</th>
               <th>Email</th>
             </tr>
           </thead>
@@ -199,7 +198,7 @@
           });
 
         if (visible.length === 0) {
-          showEmpty(tbody, 8, 'Nenhum fornecedor neste estado.');
+          showEmpty(tbody, 7, 'Nenhum fornecedor neste estado.');
           return;
         }
 
@@ -219,14 +218,6 @@
           addCell(tr, showDate(r.replied_at), 'eu-muted');
           addCell(tr, r.feedback || '—', r.feedback ? 'eu-feedback' : 'eu-muted');
           addCell(tr, hasAmount(r) ? formatEur.format(Number(r.amount_eur)) : '—', 'eu-num');
-
-          var exterior = addCell(tr, r.exterior_eur === null || r.exterior_eur === undefined ? '—' : formatEur.format(Number(r.exterior_eur)), 'eu-num');
-
-          if (r.exterior_note) {
-            exterior.title = r.exterior_note;
-            exterior.style.textDecoration = 'underline dotted';
-            exterior.style.cursor = 'help';
-          }
 
           var link = document.createElement('td');
 
@@ -300,7 +291,7 @@
 
       var result = await window.euClient
         .from('quote_requests')
-        .select('company, locality, channel, email, phone, distance_km, note, status, sent_at, replied_at, feedback, amount_eur, exterior_eur, exterior_note, email_url, updated_at')
+        .select('company, locality, channel, email, phone, distance_km, note, status, sent_at, replied_at, feedback, amount_eur, email_url, updated_at')
         .eq('project', PROJECT);
 
       if (result.error) {
