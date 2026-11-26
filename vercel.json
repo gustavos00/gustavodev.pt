@@ -54,7 +54,7 @@
     },
     {
       "source": "/vida/:path*",
-      "destination": "/vida/index.html"
+      "destination": "/vida/index"
     },
     {
       "source": "/",
