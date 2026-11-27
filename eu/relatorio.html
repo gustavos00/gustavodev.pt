@@ -118,12 +118,9 @@
   .share:hover { background: var(--accent-soft); }
   .share:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .share-status { font-size: 13px; color: var(--soft); min-height: 1.2em; }
-  .finalists { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) 24px minmax(0, 1fr); gap: 16px; align-items: stretch; }
-  .divider { display: flex; justify-content: center; }
-  .divider span { width: 1px; background: var(--rule); border-left: 1px dashed var(--faint); }
+  .finalists { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
   .fin { background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
   .fin.top { border: 2px solid var(--accent); }
-  .fin.ref { background: transparent; border: 1px dashed var(--faint); }
   .fin .rank { font: 500 12px/1.4 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); }
   .fin.top .rank { color: var(--accent); }
   .fin h3 { font-size: 20px; }
@@ -137,7 +134,6 @@
   .fin .bottom { font-size: 14px; color: var(--soft); margin-top: auto; padding-top: 4px; }
   @media (max-width: 960px) {
     .finalists { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .divider { display: none; }
   }
   @media (max-width: 560px) {
     .finalists { grid-template-columns: 1fr; }
@@ -188,8 +184,8 @@
   <section id="finalistas" aria-labelledby="h-finalistas">
     <div class="finalists-head">
       <div class="col">
-        <h2 id="h-finalistas">Os 3 melhores orçamentos, e a Janelas Perfeitas</h2>
-        <p class="note">Os três com o mesmo material (Cortizo A70/C70 e ferragem Roto NX) e já revistos com tudo o que foi pedido, ordenados por qualidade/preço. À direita, a Janelas Perfeitas, para comparação. Valores com IVA.</p>
+        <h2 id="h-finalistas">Os 4 orçamentos finalistas</h2>
+        <p class="note">Os três melhores (Cortizo A70/C70 e Roto NX, já revistos com tudo o que foi pedido) e a Janelas Perfeitas, ordenados por qualidade/preço. Valores com IVA.</p>
       </div>
       <div>
         <button type="button" class="share" id="share-finalists" data-url="https://eu.gustavodev.pt/relatorio#finalistas">Partilhar esta comparação</button>
@@ -251,9 +247,8 @@
         </dl>
         <p class="bottom">O mesmo material da Fabríu, mas mais cara e sem desconto.</p>
       </article>
-      <div class="divider" aria-hidden="true"><span></span></div>
-      <article class="fin ref">
-        <p class="rank">Para comparação</p>
+      <article class="fin">
+        <p class="rank">4.º</p>
         <h3>Janelas Perfeitas</h3>
         <div class="figures">
           <div><b>~13 469 €</b><small>total estimado</small></div>
@@ -261,14 +256,14 @@
         </div>
         <p class="delta">~+3 250 € no total · +1 944 € nas exteriores</p>
         <dl>
-          <dt>Vidro</dt><dd class="warn">4/18/6: confirmar que o de 6 mm fica do lado de fora</dd>
+          <dt>Vidro</dt><dd class="ok">Guardian Sun 4/18/6, com o de 6 mm do lado de fora (confirmado)</dd>
           <dt>Estores</dt><dd>Compactos, só nas marquises</dd>
           <dt>Cozinha</dt><dd class="ok">Oscilobatente, 3 folhas</dd>
           <dt>Garantias</dt><dd class="warn">6 anos em tudo</dd>
           <dt>Prazo</dt><dd class="warn">8–12 semanas</dd>
           <dt>Avaliações</dt><dd>4,8 ★ (237)</dd>
         </dl>
-        <p class="bottom">Ganha na cozinha oscilobatente e na câmara de 18 mm, mas a Fabríu pode orçar as duas por bem menos do que a diferença. Falta o vidro fixo F1.</p>
+        <p class="bottom">Ganha na cozinha oscilobatente e na câmara de 18 mm, mas a Fabríu pode orçar as duas por bem menos do que a diferença.</p>
       </article>
     </div>
   </section>
@@ -433,7 +428,7 @@
             <td class="ok">Roto</td>
             <td class="ok">Guardian Sun 4/18/6</td>
             <td>Compactos de fita</td>
-            <td><span class="bad">Falta o F1</span>; <span class="ok">portas já em batente; cozinha sem estore</span></td>
+            <td class="ok">Portas já em batente; cozinha sem estore</td>
             <td class="warn">6 anos para tudo</td>
             <td class="warn">8–12 semanas</td>
             <td>~4/12</td>
@@ -531,7 +526,7 @@
       <article class="card">
         <div class="card-head"><h3>Janelas Perfeitas</h3><span class="chip bad">Não</span></div>
         <p class="price num">~13 469 €</p>
-        <p class="body">Continua das mais caras, mesmo depois da visita e já com 10% de desconto e a cozinha em oscilobatente, como escolheste. Perfil Cortizo A70. As portas já vêm em batente e a cozinha sem estore, como agora queres, mas falta o vidro fixo F1. Na nova proposta, as janelas exteriores (sem as portas de sacada) ficam em 10 300 €, cerca de 1 950 € acima da Fabríu e da VIP; com as 3 portas ao preço anterior, o total ronda 13 469 €. O prazo é de 8 a 12 semanas.</p>
+        <p class="body">Continua das mais caras, mesmo depois da visita e já com 10% de desconto e a cozinha em oscilobatente, como escolheste. Perfil Cortizo A70. As portas já vêm em batente e a cozinha sem estore, como agora queres. Na nova proposta, as janelas exteriores (sem as portas de sacada) ficam em 10 300 €, cerca de 1 950 € acima da Fabríu e da VIP; com as 3 portas ao preço anterior, o total ronda 13 469 €. O prazo é de 8 a 12 semanas.</p>
       </article>
     </div>
   </section>
