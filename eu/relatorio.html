@@ -113,6 +113,35 @@
     .bar-row, .axis { grid-template-columns: 100px 1fr; }
     .bar-name { font-size: 13px; }
   }
+  .finalists-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+  .share { display: inline-flex; align-items: center; gap: 8px; font: 500 14px/1 var(--sans); color: var(--accent); background: var(--panel); border: 1px solid var(--accent); border-radius: 999px; padding: 10px 16px; cursor: pointer; }
+  .share:hover { background: var(--accent-soft); }
+  .share:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .share-status { font-size: 13px; color: var(--soft); min-height: 1.2em; }
+  .finalists { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) 24px minmax(0, 1fr); gap: 16px; align-items: stretch; }
+  .divider { display: flex; justify-content: center; }
+  .divider span { width: 1px; background: var(--rule); border-left: 1px dashed var(--faint); }
+  .fin { background: var(--panel); border: 1px solid var(--rule); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .fin.top { border: 2px solid var(--accent); }
+  .fin.ref { background: transparent; border: 1px dashed var(--faint); }
+  .fin .rank { font: 500 12px/1.4 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); }
+  .fin.top .rank { color: var(--accent); }
+  .fin h3 { font-size: 20px; }
+  .fin .figures { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding-block: 10px; border-block: 1px solid var(--rule); }
+  .fin .figures b { display: block; font: 600 19px/1.15 var(--serif); font-variant-numeric: tabular-nums; }
+  .fin .figures small { font-size: 12px; color: var(--faint); }
+  .fin .delta { font: 500 12.5px/1.3 var(--mono); }
+  .fin dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 10px; font-size: 13.5px; }
+  .fin dt { color: var(--faint); }
+  .fin dd { margin: 0; }
+  .fin .bottom { font-size: 14px; color: var(--soft); margin-top: auto; padding-top: 4px; }
+  @media (max-width: 960px) {
+    .finalists { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .divider { display: none; }
+  }
+  @media (max-width: 560px) {
+    .finalists { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -153,6 +182,94 @@
         <p class="name">Windoor Alverca</p>
         <p class="why">Revista a 23/11 com 3 portas de batente e estores manuais: 11 971 €, mais 1 755 € do que a Fabríu pelo mesmo material. Ainda deixa um estore motorizado na cozinha.</p>
       </div>
+    </div>
+  </section>
+
+  <section id="finalistas" aria-labelledby="h-finalistas">
+    <div class="finalists-head">
+      <div class="col">
+        <h2 id="h-finalistas">Os 3 melhores orçamentos, e a Janelas Perfeitas</h2>
+        <p class="note">Os três com o mesmo material (Cortizo A70/C70 e ferragem Roto NX) e já revistos com tudo o que foi pedido, ordenados por qualidade/preço. À direita, a Janelas Perfeitas, para comparação. Valores com IVA.</p>
+      </div>
+      <div>
+        <button type="button" class="share" id="share-finalists" data-url="https://eu.gustavodev.pt/relatorio#finalistas">Partilhar esta comparação</button>
+        <p class="share-status" id="share-status" role="status"></p>
+      </div>
+    </div>
+    <div class="finalists">
+      <article class="fin top">
+        <p class="rank">1.º · Recomendada</p>
+        <h3>Fabríu</h3>
+        <div class="figures">
+          <div><b>10 216 €</b><small>total</small></div>
+          <div><b>8 356 €</b><small>janelas exteriores</small></div>
+        </div>
+        <p class="delta">Referência</p>
+        <dl>
+          <dt>Vidro</dt><dd class="ok">Guardian Sun 6/14/4</dd>
+          <dt>Estores</dt><dd class="ok">Interiores, caixa isolada, só nas marquises</dd>
+          <dt>Cozinha</dt><dd>De correr (C70)</dd>
+          <dt>Garantias</dt><dd>Perfil 10 · ferragem 3 · vidro 3 anos</dd>
+          <dt>Prazo</dt><dd>15–25 dias úteis</dd>
+          <dt>Avaliações</dt><dd class="ok">4,9 ★ (269)</dd>
+        </dl>
+        <p class="bottom">Tudo como pedido, a empresa mais bem avaliada e 10% pagos só no fim.</p>
+      </article>
+      <article class="fin">
+        <p class="rank">2.º · Empatada no preço</p>
+        <h3>VIP Janelas</h3>
+        <div class="figures">
+          <div><b>10 337 €</b><small>total</small></div>
+          <div><b>8 304 €</b><small>janelas exteriores</small></div>
+        </div>
+        <p class="delta">+121 € no total · −52 € nas exteriores</p>
+        <dl>
+          <dt>Vidro</dt><dd class="warn">6/16/6 simétrico (cozinha 6/14/4)</dd>
+          <dt>Estores</dt><dd class="warn">Compactos, caixa interior; isolamento não indicado</dd>
+          <dt>Cozinha</dt><dd>De correr (C70)</dd>
+          <dt>Garantias</dt><dd>Perfil 10 · ferragem 3 · <span class="warn">vidro 2 anos</span></dd>
+          <dt>Prazo</dt><dd>30 dias úteis</dd>
+          <dt>Avaliações</dt><dd class="warn">4,9 ★ (11)</dd>
+        </dl>
+        <p class="bottom">Mesmo preço e material, a 500 m da obra. Fica atrás no vidro e na confiança, por ter poucas avaliações.</p>
+      </article>
+      <article class="fin">
+        <p class="rank">3.º</p>
+        <h3>Windoor Alverca</h3>
+        <div class="figures">
+          <div><b>11 971 €</b><small>total</small></div>
+          <div><b>9 125 €</b><small>janelas exteriores</small></div>
+        </div>
+        <p class="delta">+1 755 € no total · +769 € nas exteriores</p>
+        <dl>
+          <dt>Vidro</dt><dd class="ok">Guardian Sun 6/14/4</dd>
+          <dt>Estores</dt><dd class="warn">Manuais nas marquises; ainda um motorizado na cozinha</dd>
+          <dt>Cozinha</dt><dd>De correr (C70)</dd>
+          <dt>Garantias</dt><dd>Perfil 10 · ferragem 3 · vidro 3 anos</dd>
+          <dt>Prazo</dt><dd class="ok">15 dias úteis</dd>
+          <dt>Avaliações</dt><dd>5,0 ★ (14); reclamações no Portal da Queixa</dd>
+        </dl>
+        <p class="bottom">O mesmo material da Fabríu, mas mais cara e sem desconto.</p>
+      </article>
+      <div class="divider" aria-hidden="true"><span></span></div>
+      <article class="fin ref">
+        <p class="rank">Para comparação</p>
+        <h3>Janelas Perfeitas</h3>
+        <div class="figures">
+          <div><b>~13 469 €</b><small>total estimado</small></div>
+          <div><b>10 300 €</b><small>janelas exteriores</small></div>
+        </div>
+        <p class="delta">~+3 250 € no total · +1 944 € nas exteriores</p>
+        <dl>
+          <dt>Vidro</dt><dd class="warn">4/18/6: confirmar que o de 6 mm fica do lado de fora</dd>
+          <dt>Estores</dt><dd>Compactos, só nas marquises</dd>
+          <dt>Cozinha</dt><dd class="ok">Oscilobatente, 3 folhas</dd>
+          <dt>Garantias</dt><dd class="warn">6 anos em tudo</dd>
+          <dt>Prazo</dt><dd class="warn">8–12 semanas</dd>
+          <dt>Avaliações</dt><dd>4,8 ★ (237)</dd>
+        </dl>
+        <p class="bottom">Ganha na cozinha oscilobatente e na câmara de 18 mm, mas a Fabríu pode orçar as duas por bem menos do que a diferença. Falta o vidro fixo F1.</p>
+      </article>
     </div>
   </section>
 
@@ -452,5 +569,37 @@
   </section>
 </div>
 
+<script>
+  (function () {
+    var button = document.getElementById('share-finalists');
+    var status = document.getElementById('share-status');
+
+    if (!button) {
+      return;
+    }
+
+    button.addEventListener('click', async function () {
+      var url = button.dataset.url;
+
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'Orçamentos de caixilharia: os finalistas', url: url });
+          return;
+        } catch (error) {
+          if (error && error.name === 'AbortError') {
+            return;
+          }
+        }
+      }
+
+      try {
+        await navigator.clipboard.writeText(url);
+        status.textContent = 'Link copiado: ' + url;
+      } catch (error) {
+        status.textContent = url;
+      }
+    });
+  })();
+</script>
 </body>
 </html>
